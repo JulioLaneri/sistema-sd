@@ -3,6 +3,7 @@ package com.sd.sistemasd.service.Cliente;
 import com.sd.sistemasd.beans.cliente.ClienteBean;
 import com.sd.sistemasd.dao.cliente.ClienteDAO;
 import com.sd.sistemasd.dto.cliente.ClienteDTO;
+import com.sd.sistemasd.service.Email.IEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -12,12 +13,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class ClienteServiceImpl implements IClienteService {
 
     @Autowired
     private ClienteDAO clienteDAO;
+    @Autowired
+    private IEmailService emailService;
     @Override
     @Transactional
     public ClienteDTO createCliente(ClienteDTO clienteDTO) {
@@ -70,6 +76,34 @@ public class ClienteServiceImpl implements IClienteService {
         return null;
     }
 
+    @Transactional
+    public void enviarCorreoATodos(String subject, String text) {
+        // Obtener todos los clientes de la base de datos
+        List<ClienteBean> clientes = clienteDAO.findAll();
+        List<String> direccionesCorreo = new ArrayList<>();
+
+        // Iterar sobre cada cliente y agregar la dirección de correo a la lista
+        for (ClienteBean cliente : clientes) {
+            String asunto = subject + " - Cliente: " + cliente.getNombre();
+            String texto = text + "\n\nCliente: " + cliente.getNombre();
+            String correoCliente = cliente.getCorreoElectronico();
+            if (correoCliente != null && !correoCliente.isEmpty()) {
+                direccionesCorreo.add(correoCliente);
+            }
+        }
+        // Verificar que hay al menos una dirección de correo antes de intentar enviar el correo
+        if (!direccionesCorreo.isEmpty()) {
+            // Convertir la lista de direcciones de correo a un array
+            String[] direccionesArray = direccionesCorreo.toArray(new String[0]);
+
+            String asunto = subject + " - Cliente: " + clientes.get(0).getNombre();
+            String texto= text + "\n\nCliente: " + clientes.get(0).getNombre();
+
+            // Enviar el correo a todas las direcciones de correo al mismo tiempo
+            emailService.sendMailToMultipleAddresses(direccionesArray, asunto, texto);
+        }
+    }
+
     @Override
     @CacheEvict(cacheNames = "sistema-sd", key = "'cliente_' + #id" )
     @Transactional
@@ -86,4 +120,6 @@ public class ClienteServiceImpl implements IClienteService {
         dto.setTelefono(cliente.getTelefono());
         return dto;
     }
+
+
 }

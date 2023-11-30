@@ -12,4 +12,5 @@ public interface IClienteService {
     public Page<ClienteDTO> getAllClientes(Pageable pageable);
     ClienteDTO updateCliente(Long id, ClienteDTO clienteDTO);
     void deleteCliente(Long id);
+    void enviarCorreoATodos(String subject, String text);
 }
