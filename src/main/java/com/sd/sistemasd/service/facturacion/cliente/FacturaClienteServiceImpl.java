@@ -6,11 +6,16 @@ import com.sd.sistemasd.beans.facturacion.cliente.FacturacionClienteDetalles;
 import com.sd.sistemasd.dao.cliente.ClienteDAO;
 import com.sd.sistemasd.dao.facturacionCliente.FacturacionClienteDAO;
 import com.sd.sistemasd.dao.facturacionCliente.FacturacionClienteDetallesDAO;
+import com.sd.sistemasd.dto.facturacion.cliente.FactClienteDetallesDTO;
 import com.sd.sistemasd.dto.facturacion.cliente.FacturacionClienteDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +25,9 @@ public class FacturaClienteServiceImpl implements IFacturaClienteService{
 
     @Autowired
     FacturacionClienteDAO facturaDAO;
+
+    @Autowired
+    FactClienteDetallesServiceImpl detallesService;
 
     @Autowired
     ClienteDAO clienteDAO;
@@ -59,10 +67,25 @@ public class FacturaClienteServiceImpl implements IFacturaClienteService{
     }
 
     @Override
-    public List<FacturacionClienteDTO> getAll(int page, int size) {
-        List<FacturaClienteBean> facturas = facturaDAO.findAll();
-        return convertToDTOList(facturas);
+    public Page<FacturacionClienteDTO> getAll(Pageable pageable) {
+        Page<FacturaClienteBean> facturasBean = facturaDAO.findAllWithDetalles(pageable);
+        return facturasBean.map(this::toDTOWithDetails);
     }
+
+
+    private FacturacionClienteDTO toDTOWithDetails(FacturaClienteBean facturaBean) {
+        FacturacionClienteDTO dto = toDTO(facturaBean);
+        List<FactClienteDetallesDTO> detallesDTOList = facturaBean.getDetalles().stream()
+                .map(this::toDetallesDTO)
+                .collect(Collectors.toList());
+        dto.setDetalles(detallesDTOList);
+        return dto;
+    }
+
+    private FactClienteDetallesDTO toDetallesDTO(FacturacionClienteDetalles detalles) {
+        return modelMapper.map(detalles, FactClienteDetallesDTO.class);
+    }
+
 
     @Override
     public void delete(Long id) {
@@ -89,4 +112,6 @@ public class FacturaClienteServiceImpl implements IFacturaClienteService{
     private List<FacturacionClienteDTO> convertToDTOList(List<FacturaClienteBean> facturasBean ){
         return facturasBean.stream().map(this::toDTO).collect(Collectors.toList());
     }
+
+
 }

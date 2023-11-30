@@ -3,6 +3,7 @@ package com.sd.sistemasd.beans.suscripcion;
 
 import com.sd.sistemasd.beans.base.AbstractBean;
 import com.sd.sistemasd.beans.cliente.ClienteBean;
+import com.sd.sistemasd.beans.facturacion.cliente.FacturacionClienteDetalles;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,15 +19,6 @@ public class SuscripcionBean extends AbstractBean {
     @Column(name = "suscripcionid", nullable = false, unique = true)
     private Long suscripcionID;
 
-    @Column(name = "planPago", nullable = true)
-    private String planPago;
-
-    @Column(name = "montoTotal", nullable = true)
-    private double montoTotal;
-
-    @Column(name = "estado", nullable = true)
-    private String estado;
-
     // Relación con Cliente
     @ManyToOne
     @JoinColumn(name = "clienteid")
@@ -35,4 +27,7 @@ public class SuscripcionBean extends AbstractBean {
     // Relación con Detalle Suscripción
     @OneToMany(mappedBy = "suscripcion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SuscripcionDetalleBean> suscripcionDetalles;
+
+    @OneToMany(mappedBy = "suscripcion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FacturacionClienteDetalles> facturacionClienteDetalles;
 }

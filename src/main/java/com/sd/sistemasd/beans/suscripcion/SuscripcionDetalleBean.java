@@ -10,11 +10,20 @@ import lombok.Data;
 @Table(name = "suscripcionDetalle")
 @Data
 public class SuscripcionDetalleBean extends AbstractBean {
-    private static final long serialVersionUID = 1L;
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long suscripcionDetalleID;
+
+    @Column(name = "planPago", nullable = true)
+    private String planPago;
+
+    @Column(name = "costo", nullable = true)
+    private double costo;
+
+    @Column(name = "estado", nullable = true)
+    private String estado;
 
     // Relación con Suscripciones como Cabecera-Detalle
     @ManyToOne

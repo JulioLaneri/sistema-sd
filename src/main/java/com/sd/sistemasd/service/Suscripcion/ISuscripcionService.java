@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface ISuscripcionService {
     SuscripcionDTO createSuscripcion(SuscripcionDTO suscripcionDTO);
+
+    public SuscripcionConDetallesDTO createSuscripcionConDetalles(SuscripcionConDetallesDTO suscripcionConDetallesDTO);
     SuscripcionDTO getSuscripcionById(Long id);
     List<SuscripcionDTO> getAllSuscripciones(int page, int size);
     SuscripcionDTO updateSuscripcion(Long id, SuscripcionDTO suscripcionDTO);

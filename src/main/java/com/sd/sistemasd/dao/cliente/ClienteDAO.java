@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClienteDAO extends JpaRepository<ClienteBean,Long> {
     Page<ClienteBean> findAll(Pageable pageable);
+    ClienteBean findByNombre(String nombre);
 }

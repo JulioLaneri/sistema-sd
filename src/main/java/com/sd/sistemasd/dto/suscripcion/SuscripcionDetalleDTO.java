@@ -8,4 +8,7 @@ public class SuscripcionDetalleDTO extends BaseDTO {
     private Long suscripcionDetalleID;
     private Long suscripcionID;
     private Long deporteID;
+    private String planPago;
+    private double costo;
+    private String estado;
 }

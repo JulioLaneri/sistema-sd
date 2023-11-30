@@ -43,9 +43,6 @@ public class SuscripcionServiceImpl implements ISuscripcionService {
     @Transactional
     public SuscripcionDTO createSuscripcion(SuscripcionDTO suscripcionDTO) {
         SuscripcionBean suscripcion = new SuscripcionBean();
-        suscripcion.setPlanPago(suscripcionDTO.getPlanPago());
-        suscripcion.setMontoTotal(suscripcionDTO.getMontoTotal());
-
         // Establece la relación con el cliente utilizando el clienteID del DTO.
         ClienteBean cliente = clienteDAO.findById(suscripcionDTO.getClienteID()).orElse(null);
         if (cliente != null) {
@@ -58,8 +55,35 @@ public class SuscripcionServiceImpl implements ISuscripcionService {
 
     @Override
     @Transactional
+    public SuscripcionConDetallesDTO createSuscripcionConDetalles(SuscripcionConDetallesDTO suscripcionConDetallesDTO) {
+        SuscripcionDTO suscripcionDTO = suscripcionConDetallesDTO.getSuscripcion();
+        List<SuscripcionDetalleDTO> detallesDTO = suscripcionConDetallesDTO.getDetalles();
+
+        // Crear la suscripción principal
+        SuscripcionDTO createdSuscripcion = createSuscripcion(suscripcionDTO);
+
+        // Crear los detalles de suscripción asociados a la suscripción principal
+        List<SuscripcionDetalleDTO> createdDetalles = new ArrayList<>();
+        for (SuscripcionDetalleDTO detalleDTO : detallesDTO) {
+            detalleDTO.setSuscripcionID(createdSuscripcion.getSuscripcionID());
+            SuscripcionDetalleDTO createdDetalle = createSuscripcionDetalle(detalleDTO);
+            createdDetalles.add(createdDetalle);
+        }
+
+        // Construir y retornar la respuesta con la suscripción principal y sus detalles
+        SuscripcionConDetallesDTO responseDTO = new SuscripcionConDetallesDTO();
+        responseDTO.setSuscripcion(createdSuscripcion);
+        responseDTO.setDetalles(createdDetalles);
+        return responseDTO;
+    }
+
+    @Override
+    @Transactional
     public SuscripcionDetalleDTO createSuscripcionDetalle(SuscripcionDetalleDTO detalleDTO) {
         SuscripcionDetalleBean detalle = new SuscripcionDetalleBean();
+        detalle.setCosto(detalleDTO.getCosto());
+        detalle.setEstado(detalleDTO.getEstado());
+        detalle.setPlanPago(detalleDTO.getPlanPago());
 
         // Establece la relación con la suscripción utilizando el suscripcionID del DTO.
         SuscripcionBean suscripcion = suscripcionDAO.findById(detalleDTO.getSuscripcionID()).orElse(null);
@@ -135,10 +159,7 @@ public class SuscripcionServiceImpl implements ISuscripcionService {
     public SuscripcionDTO updateSuscripcion(Long id, SuscripcionDTO suscripcionDTO) {
         SuscripcionBean existingSuscripcion = suscripcionDAO.findById(id).orElse(null);
         if (existingSuscripcion != null) {
-            existingSuscripcion.setPlanPago(suscripcionDTO.getPlanPago());
-            existingSuscripcion.setMontoTotal(suscripcionDTO.getMontoTotal());
             // Actualiza la relación con el cliente si es necesario.
-
             existingSuscripcion = suscripcionDAO.save(existingSuscripcion);
             return convertToDTO(existingSuscripcion);
         }
@@ -181,9 +202,6 @@ public class SuscripcionServiceImpl implements ISuscripcionService {
     private SuscripcionDTO convertToDTO(SuscripcionBean suscripcion) {
         SuscripcionDTO dto = new SuscripcionDTO();
         dto.setSuscripcionID(suscripcion.getSuscripcionID());
-        dto.setPlanPago(suscripcion.getPlanPago());
-        dto.setMontoTotal(suscripcion.getMontoTotal());
-        dto.setEstado(suscripcion.getEstado());
 
         // Establece el ID del cliente en el DTO
         if (suscripcion.getCliente() != null) {
@@ -195,8 +213,10 @@ public class SuscripcionServiceImpl implements ISuscripcionService {
 
     private SuscripcionDetalleDTO convertToDetalleDTO(SuscripcionDetalleBean detalle) {
         SuscripcionDetalleDTO dto = new SuscripcionDetalleDTO();
+        dto.setCosto(detalle.getCosto());
+        dto.setEstado(detalle.getEstado());
+        dto.setPlanPago(detalle.getPlanPago());
         dto.setSuscripcionDetalleID(detalle.getSuscripcionDetalleID());
-
         // Establece el ID de la suscripción y el ID del deporte en el DTO
         if (detalle.getSuscripcion() != null) {
             dto.setSuscripcionID(detalle.getSuscripcion().getSuscripcionID());

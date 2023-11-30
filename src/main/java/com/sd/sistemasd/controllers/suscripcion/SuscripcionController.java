@@ -27,27 +27,39 @@ public class SuscripcionController {
     @Autowired
     ISuscripcionService suscripcionService;
 
+//    @PostMapping("/crearConDetalles")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    public ResponseEntity<?> createSuscripcionConDetalles(@RequestBody SuscripcionConDetallesDTO suscripcionConDetallesDTO) {
+//        try {
+//            // Extrae la información de la suscripción
+//            SuscripcionDTO suscripcionDTO = suscripcionConDetallesDTO.getSuscripcion();
+//            SuscripcionDTO createdSuscripcion = suscripcionService.createSuscripcion(suscripcionDTO);
+//
+//            // Extrae la información de los detalles de la suscripción
+//            List<SuscripcionDetalleDTO> detallesDTO = suscripcionConDetallesDTO.getDetalles();
+//            for (SuscripcionDetalleDTO detalleDTO : detallesDTO) {
+//                detalleDTO.setSuscripcionID(createdSuscripcion.getSuscripcionID());
+//                suscripcionService.createSuscripcionDetalle(detalleDTO);
+//            }
+//
+//            return new ResponseEntity<>(createdSuscripcion, HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            logger.error("Error al crear la suscripción con detalles", e);
+//            return new ResponseEntity<>("error500", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//
+//    }
+
     @PostMapping("/save")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> createSuscripcionConDetalles(@RequestBody SuscripcionConDetallesDTO suscripcionConDetallesDTO) {
-        try {
-            // Extrae la información de la suscripción
-            SuscripcionDTO suscripcionDTO = suscripcionConDetallesDTO.getSuscripcion();
-            SuscripcionDTO createdSuscripcion = suscripcionService.createSuscripcion(suscripcionDTO);
-
-            // Extrae la información de los detalles de la suscripción
-            List<SuscripcionDetalleDTO> detallesDTO = suscripcionConDetallesDTO.getDetalles();
-            for (SuscripcionDetalleDTO detalleDTO : detallesDTO) {
-                detalleDTO.setSuscripcionID(createdSuscripcion.getSuscripcionID());
-                suscripcionService.createSuscripcionDetalle(detalleDTO);
-            }
-
-            return new ResponseEntity<>(createdSuscripcion, HttpStatus.CREATED);
-        } catch (Exception e) {
-            logger.error("Error al crear la suscripción con detalles", e);
-            return new ResponseEntity<>("error500", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+    public ResponseEntity<?> createSuscripcionConDetalles(
+            @RequestBody SuscripcionConDetallesDTO suscripcionConDetallesDTO) {
+    try{
+        SuscripcionConDetallesDTO createdSuscripcion = suscripcionService.createSuscripcionConDetalles(suscripcionConDetallesDTO);
+        return new ResponseEntity<>(createdSuscripcion, HttpStatus.CREATED);
+    }catch (Exception e) {
+        logger.error("Error al crear la suscripción con detalles", e);
+        return new ResponseEntity<>("error500", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     }
 
     @GetMapping("/page/{page}")

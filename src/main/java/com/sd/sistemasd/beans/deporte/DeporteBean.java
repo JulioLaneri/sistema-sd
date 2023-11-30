@@ -1,7 +1,7 @@
 package com.sd.sistemasd.beans.deporte;
 
 
-import com.sd.sistemasd.beans.asignacion.AsignacionEntrenadorBean;
+
 import com.sd.sistemasd.beans.base.AbstractBean;
 import com.sd.sistemasd.beans.suscripcion.SuscripcionDetalleBean;
 import jakarta.persistence.*;
@@ -25,10 +25,6 @@ public class DeporteBean extends AbstractBean {
 
     @Column(name = "descripcion", nullable = true)
     private String descripcion;
-
-    // Relación con Asignación de Entrenadores por Disciplina
-    @OneToMany(mappedBy = "deporte")
-    private List<AsignacionEntrenadorBean> asignacionesEntrenador;
 
     // Relación con Detalle Suscripción
     @OneToMany(mappedBy = "deporte")

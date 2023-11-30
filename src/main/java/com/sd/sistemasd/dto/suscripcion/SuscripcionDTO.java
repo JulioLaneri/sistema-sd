@@ -6,8 +6,5 @@ import lombok.Data;
 @Data
 public class SuscripcionDTO extends BaseDTO {
     private Long suscripcionID;
-    private String planPago;
-    private double montoTotal;
-    private String estado;
     private Long clienteID;
 }

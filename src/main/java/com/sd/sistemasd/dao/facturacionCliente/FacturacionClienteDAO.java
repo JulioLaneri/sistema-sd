@@ -6,7 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 @Repository
 public interface FacturacionClienteDAO extends JpaRepository<FacturaClienteBean, Long> {
-    Page<FacturaClienteBean> findAll(Pageable pageable);
+    @Query("SELECT DISTINCT fc FROM FacturaClienteBean fc LEFT JOIN FETCH fc.detalles")
+    Page<FacturaClienteBean> findAllWithDetalles(Pageable pageable);
 }
+
