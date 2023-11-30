@@ -39,7 +39,7 @@ public class FacturacionController {
         int size = Setting.PAGE_SIZE;
         try {
             Pageable pageable = PageRequest.of(page, size);
-            return new ResponseEntity<>(facturaService.getAll(pageable), HttpStatus.OK);
+            return new ResponseEntity<>(facturaService.getAll(pageable).getContent(), HttpStatus.OK);
         }catch (ResourceNotFoundException e) {
             logger.error("facturas no encontradas", e);
             return new ResponseEntity<>("error404", HttpStatus.NOT_FOUND);
